@@ -98,12 +98,7 @@ main {
 }
 
 
-@media (hover: hover) and (pointer: fine) {
-  .main-title:hover {
-    cursor: default;
-    transform: translateY(-1.8px) scale(1.003);
-  }
-}
+
 
 /* ================= MAIN REPO ================= */
 
@@ -214,12 +209,6 @@ main {
 }
 
 
-@media (hover: hover) and (pointer: fine) {
-  .project-intro:hover {
-    cursor: default;
-    transform: translateY(-1.8px) scale(1.003);
-  }
-}
 
 /*=============  INFO ============= */
 
