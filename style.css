@@ -143,7 +143,7 @@ main {
     color: var(--accent);
   }
   .repository:hover {
-    transform: translateY(-4px) scale(1.003);
+    transform: translateY(-4px) scale(1.005);
   }
 }
 .repository:active {
@@ -184,7 +184,8 @@ main {
 
 @media (hover: hover) and (pointer: fine) {
   .project-item:hover {
-    transform: translateY(-5px) scale(1.005);
+    transform: translateY(-6px) scale(1.005);
+    color: var(--text-secondary);
   }
 }
 
