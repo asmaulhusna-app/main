@@ -26,7 +26,7 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 /* ---------- LOAD HOMEWORK FILES ---------- */
-fetch("data/homeworks.json")
+fetch("./data/homeworks.json")
   .then(r => r.json())
   .then(files => {
     const container = document.getElementById("homeworks-list");
@@ -49,5 +49,7 @@ fetch("data/homeworks.json")
 
       container.appendChild(a);
     });
-  });
+  })
+  .catch(err => console.error("Failed to load homeworks.json:", err));
+
 

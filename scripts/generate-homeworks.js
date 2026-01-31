@@ -63,6 +63,4 @@ const ask = (question) => new Promise(resolve => rl.question(question, resolve))
   // save updated JSON
   fs.writeFileSync(OUT_FILE, JSON.stringify(previous, null, 2));
   console.log("\n✅ Homeworks list updated with new files and removed deleted ones!");
-
-  console.log("\n✅ Homeworks list updated with new files!");
 })();
