@@ -25,12 +25,23 @@ document.addEventListener("DOMContentLoaded", () => {
   const container = document.getElementById("homeworksList");
   if (!container) return console.error("❌ #homeworksList not found");
 
-  // Use relative path to the JSON file in your repo
-  const jsonPath = "data/homeworks.json"; // <-- make sure this exists in the repo
+  // ❗ Relative path (required for GitHub Pages)
+  const jsonPath = "./data/homeworks.json";
+
+  // ❗ Detect local file usage
+  if (location.protocol === "file:") {
+    container.innerHTML = `
+      <p style="color:#f55">
+        ⚠️ Homeworks list requires a local server.<br>
+        Use <code>Live Server</code> or open via GitHub Pages.
+      </p>
+    `;
+    return;
+  }
 
   fetch(jsonPath)
     .then(res => {
-      if (!res.ok) throw new Error("JSON not found at " + jsonPath);
+      if (!res.ok) throw new Error("JSON not found");
       return res.json();
     })
     .then(files => {
@@ -47,16 +58,9 @@ document.addEventListener("DOMContentLoaded", () => {
           <p>${file.description}</p>
         `;
 
-        // GitHub raw file download URL
-        const rawBase = "https://asmaulhusna-app.github.io/main/";
-
         card.addEventListener("click", () => {
-          const link = document.createElement("a");
-          link.href = rawBase + file.url; // raw GitHub URL
-          link.download = file.name;      // keep original extension
-          document.body.appendChild(link);
-          link.click();
-          link.remove();
+          // ✅ Works both locally (server) & GitHub Pages
+          window.open(file.url, "_blank");
         });
 
         container.appendChild(card);
