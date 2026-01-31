@@ -59,9 +59,13 @@ document.addEventListener("DOMContentLoaded", () => {
         `;
 
         card.addEventListener("click", () => {
-          // ✅ Works both locally (server) & GitHub Pages
-          window.open(file.url, "_blank");
+          const basePath = window.location.pathname.includes("/main/")
+            ? "/main/"
+            : "/";
+
+          window.open(basePath + file.url.replace(/^\.?\//, ""), "_blank");
         });
+
 
         container.appendChild(card);
       });
