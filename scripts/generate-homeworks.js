@@ -5,76 +5,65 @@ import readline from "readline";
 const DIR = "homeworks-files";
 const OUT_DIR = "data";
 const OUT_FILE = path.join(OUT_DIR, "homeworks.json");
+const SITE_BASE = ""; // leave empty for relative paths (best for GitHub Pages)
 
-// create data folder if it doesn't exist
+if (!fs.existsSync(DIR)) fs.mkdirSync(DIR);
 if (!fs.existsSync(OUT_DIR)) fs.mkdirSync(OUT_DIR);
 
-// load previous homeworks.json if exists
 let previous = [];
 if (fs.existsSync(OUT_FILE)) {
-  previous = JSON.parse(fs.readFileSync(OUT_FILE, "utf-8"));
+  try {
+    const raw = fs.readFileSync(OUT_FILE, "utf-8").trim();
+    previous = raw ? JSON.parse(raw) : [];
+  } catch {
+    console.log("⚠️ Broken JSON — reset.");
+    previous = [];
+  }
 }
 
-// read all files in folder
-const filesInDir = fs.readdirSync(DIR);
+const filesInDir = fs.readdirSync(DIR).filter(f =>
+  fs.statSync(path.join(DIR, f)).isFile()
+);
 
-// filter new files not already in JSON
-const newFiles = filesInDir.filter(f => !previous.find(p => p.url.endsWith(f)));
-
-if (newFiles.length === 0) {
-  console.log("✅ No new files found.");
-} else {
-  console.log("🆕 New files detected:");
-  newFiles.forEach(f => console.log("  " + f));
-}
+const newFiles = filesInDir.filter(f =>
+  !previous.some(p => path.basename(p.url) === f)
+);
 
 const rl = readline.createInterface({
   input: process.stdin,
   output: process.stdout
 });
 
-// helper to ask question
-const ask = (question) => new Promise(resolve => rl.question(question, resolve));
+const ask = q => new Promise(res => rl.question(q, res));
 
 (async () => {
-  // handle new files
   for (const filename of newFiles) {
-    const full = path.join(DIR, filename);
-    const stats = fs.statSync(full);
-
+    const stats = fs.statSync(path.join(DIR, filename));
     const d = stats.birthtime;
-    const dateFormatted = `${String(d.getDate()).padStart(2,'0')}.${String(d.getMonth()+1).padStart(2,'0')}.${d.getFullYear()}`;
 
-    console.log(`\nNew file detected: ${filename}`);
-    const name = await ask("Enter display name: ");
-    const description = await ask("Enter description: ");
+    const date =
+      `${String(d.getDate()).padStart(2, "0")}.` +
+      `${String(d.getMonth() + 1).padStart(2, "0")}.` +
+      `${d.getFullYear()}`;
+
+    console.log(`\n📄 ${filename}`);
+    const name = await ask("Name: ");
+    const description = await ask("Description: ");
 
     previous.push({
       name: name || filename,
-      date: dateFormatted,
-      url: `homeworks-files/${filename}`, // GitHub Pages safe path
-      description: description || "Homework file"
+      description: description || "",
+      date,
+      url: `${SITE_BASE}homeworks-files/${filename}`
     });
   }
 
   rl.close();
 
-// check for deleted files
-const deletedFiles = previous.filter(p => !fs.existsSync(path.join(DIR, path.basename(p.url))));
+  previous = previous.filter(p =>
+    fs.existsSync(path.join(DIR, path.basename(p.url)))
+  );
 
-if (deletedFiles.length > 0) {
-  console.log("\n⚠️ The following files are missing and will be removed from JSON:");
-  deletedFiles.forEach(p => console.log("  " + p.name));
-}
-
-// remove all deleted files from JSON
-previous = previous.filter(p => fs.existsSync(path.join(DIR, path.basename(p.url))));
-
-
-  // remove deleted files from JSON
-  previous = previous.filter(p => fs.existsSync(path.join(DIR, path.basename(p.url))));
-
-  // save updated JSON
   fs.writeFileSync(OUT_FILE, JSON.stringify(previous, null, 2));
-  console.log("\n✅ Homeworks list updated!");
+  console.log("\n✅ homeworks.json updated!");
 })();

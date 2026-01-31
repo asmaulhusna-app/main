@@ -26,30 +26,25 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 /* ---------- LOAD HOMEWORK FILES ---------- */
-fetch("./data/homeworks.json")
-  .then(r => r.json())
+fetch("data/homeworks.json")
+  .then(res => res.json())
   .then(files => {
-    const container = document.getElementById("homeworks-list");
-    if (!container) return;
+    const container = document.getElementById("homeworksList");
 
     files.forEach(file => {
       const a = document.createElement("a");
       a.href = file.url;
       a.download = "";
-      a.style.color = "inherit";
-      a.style.textDecoration = "none";
+      a.className = "project-item";
+      a.target = "_blank";
 
       a.innerHTML = `
-        <div class="project-item">
-          <h3>${file.name}</h3>
-          <p>Uploaded: ${file.date}</p>
-          <p>Description: ${file.description}</p>
-        </div>
+        <h3>${file.name}</h3>
+        <p>Uploaded: ${file.date}</p>
+        <p>${file.description}</p>
       `;
 
       container.appendChild(a);
     });
-  })
-  .catch(err => console.error("Failed to load homeworks.json:", err));
-
+  });
 
