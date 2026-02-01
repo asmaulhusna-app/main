@@ -2,12 +2,48 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
+  <link rel="icon" href="data/ezp.ico" type="image/x-icon" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>EZP — Download</title>
 
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;800&display=swap" rel="stylesheet">
 
   <style>
+    /* Add/Update these rules in your <style> block */
+    * {
+      user-select: none; /* Stops text selection everywhere */
+      -webkit-user-select: none;
+    }
+
+    .btn, .preview {
+      cursor: pointer !important; /* Forces the hand icon */
+    }
+
+    /* If you want the tagline/logo to NOT have a hand icon, keep them default */
+    .logo, .tagline {
+      cursor: default;
+    }
+    * {
+      /* No more I-beam or text highlighting */
+      user-select: none;
+      -webkit-user-select: none;
+    }
+
+    .preview {
+      /* Always show the hand icon over the video */
+      cursor: pointer !important;
+    }
+
+    .sound-indicator {
+      /* This is key: clicks go "through" the badge to the video */
+      pointer-events: none; 
+      transition: opacity 0.1s ;
+    }
+
+    /* The state for when sound is playing */
+    .is-hidden {
+      opacity: 0 !important;
+    }
     :root {
       --bg1: #0b0f1a;
       --bg2: #111827;
@@ -274,7 +310,7 @@
     </p>
 
     <section class="card">
-      <div class="preview">
+      <div class="preview" id="videoContainer" style="cursor: pointer;">
         <video
           id="previewVideo"
           src="data/preview.mp4"
@@ -283,10 +319,8 @@
           muted
           playsinline
           preload="auto"
-          disablepictureinpicture
         ></video>
 
-        <!-- 🔊 MUTED BADGE -->
         <div id="soundBadge" class="sound-indicator">
           🔇 Sound off
         </div>
@@ -330,26 +364,30 @@
       city.appendChild(b);
     }
 
+
     /* ===== VIDEO CONTROL ===== */
     const video = document.getElementById("previewVideo");
     const badge = document.getElementById("soundBadge");
+    const videoContainer = document.getElementById("videoContainer");
 
-    video.play().catch(() => {});
+    videoContainer.addEventListener("click", () => {
+      // Toggle the mute state
+      video.muted = !video.muted;
 
-    const enableSound = () => {
-      video.muted = false;
-      video.volume = 1;
-      video.play().catch(() => {});
-      badge.classList.add("hidden");
-      window.removeEventListener("click", enableSound);
-      window.removeEventListener("touchstart", enableSound);
-      window.removeEventListener("keydown", enableSound);
-    };
+      if (video.muted) {
+        // Show the "Sound off" badge again
+        badge.classList.remove("is-hidden");
+      } else {
+        // Hide the badge entirely when sound is playing
+        badge.classList.add("is-hidden");
+        video.play().catch(() => {}); 
+      }
+    });
 
-    window.addEventListener("click", enableSound);
-    window.addEventListener("touchstart", enableSound);
-    window.addEventListener("keydown", enableSound);
+    // Listen for clicks specifically on the video area
+    videoContainer.addEventListener("click", toggleSound);
 
+    // Keep the video playing if it tries to auto-pause
     video.addEventListener("pause", () => video.play());
   </script>
 
